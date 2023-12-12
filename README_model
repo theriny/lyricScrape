@@ -1,0 +1,101 @@
+# GPT-2 Language Model Fine-Tuning
+
+This repository contains code for fine-tuning the GPT-2 language model on a custom dataset using the Hugging Face Transformers library.
+
+## Getting Started
+
+### Prerequisites
+
+Before running the code, make sure you have the required dependencies installed. You can install them using the following command:
+
+```bash
+pip install transformers
+```
+
+### Code Overview
+
+The code consists of the following components:
+
+- **GPT-2 Model and Tokenizer Initialization:**
+  The code initializes the GPT-2 language model and tokenizer from the Hugging Face Transformers library.
+
+```python
+from transformers import GPT2LMHeadModel, GPT2Tokenizer, GPT2Config
+
+model_name = "gpt2"
+model = GPT2LMHeadModel.from_pretrained(model_name)
+tokenizer = GPT2Tokenizer.from_pretrained(model_name)
+```
+
+- **Loading the Dataset:**
+  The code loads a custom dataset for fine-tuning. Ensure to replace `'input.csv'` with the path to your own dataset.
+
+```python
+from transformers import TextDataset, DataCollatorForLanguageModeling
+
+train_dataset = TextDataset(
+    tokenizer=tokenizer,
+    file_path='input.csv',
+    block_size=128
+)
+```
+
+- **Data Collator for Language Modeling:**
+  A data collator is created for language modeling tasks with the specified tokenizer and MLM (Masked Language Model) set to `False`.
+
+```python
+data_collator = DataCollatorForLanguageModeling(
+    tokenizer=tokenizer,
+    mlm=False
+)
+```
+
+- **Fine-Tuning Setup:**
+  The code sets up fine-tuning arguments, creates an output directory, and configures training parameters.
+
+```python
+from transformers import Trainer, TrainingArguments
+import os
+
+if not os.path.exists('output2'):
+    try:
+        os.makedirs('output2')
+    except OSError as e:
+        print(e)
+else:
+    print(f"Folder already exists.")
+
+training_args = TrainingArguments(
+    output_dir="output2",
+    overwrite_output_dir=True,
+    num_train_epochs=3,
+    per_device_train_batch_size=4,
+    save_total_limit=2,
+    logging_steps=2
+)
+```
+
+- **Training and Saving the Model:**
+  The Trainer is instantiated with the model, training arguments, data collator, and training dataset. The model is then fine-tuned, and the fine-tuned model is saved to the specified output directory.
+
+```python
+trainer = Trainer(
+    model=model,
+    args=training_args,
+    data_collator=data_collator,
+    train_dataset=train_dataset,
+)
+
+trainer.train()
+model.save_pretrained("output2")
+```
+
+## Running the Code
+
+To fine-tune the GPT-2 model on your dataset, follow these steps:
+
+1. Replace `'input.csv'` with the path to your dataset in the `train_dataset` initialization.
+2. Adjust fine-tuning parameters such as `num_train_epochs`, `per_device_train_batch_size`, etc., based on your requirements.
+3. Run the script, and the fine-tuned model will be saved in the specified output directory.
+
+Feel free to explore and modify the code to suit your specific use case.
