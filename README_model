@@ -10,6 +10,7 @@ Before running the code, make sure you have the required dependencies installed.
 
 ```bash
 pip install transformers
+pip3 install torch torchvision torchaudio
 ```
 
 ### Code Overview
